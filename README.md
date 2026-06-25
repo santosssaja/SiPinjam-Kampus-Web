@@ -41,7 +41,7 @@ SiPinjam Kampus solves critical pain points in campus resource management:
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    Monorepo Root                         │
+│                    Monorepo Root                        │
 │                                                         │
 │  apps/                                                  │
 │  ├── backend/          FastAPI (Python 3.12)            │
@@ -184,6 +184,7 @@ SiPinjam Kampus Web/
 ## Domain Models
 
 ### User
+
 | Field | Type | Description |
 |-------|------|-------------|
 | id | int | Primary key |
@@ -194,6 +195,7 @@ SiPinjam Kampus Web/
 | is_active | bool | Soft disable flag |
 
 ### Item
+
 | Field | Type | Description |
 |-------|------|-------------|
 | id | int | Primary key |
@@ -203,6 +205,7 @@ SiPinjam Kampus Web/
 | description | string? | Optional description |
 
 ### Room
+
 | Field | Type | Description |
 |-------|------|-------------|
 | id | int | Primary key |
@@ -211,6 +214,7 @@ SiPinjam Kampus Web/
 | capacity | int | Max occupants |
 
 ### Loan
+
 | Field | Type | Description |
 |-------|------|-------------|
 | id | int | Primary key |
@@ -242,6 +246,7 @@ SiPinjam Kampus Web/
 Base URL: `http://localhost:8000/api/v1`
 
 ### Auth
+
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
 | POST | `/auth/register` | Public | Register new user |
@@ -249,6 +254,7 @@ Base URL: `http://localhost:8000/api/v1`
 | GET | `/auth/me` | Bearer | Get current user |
 
 ### Items
+
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
 | GET | `/items` | Bearer | List all items |
@@ -258,6 +264,7 @@ Base URL: `http://localhost:8000/api/v1`
 | DELETE | `/items/{id}` | Admin | Soft-delete item |
 
 ### Rooms
+
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
 | GET | `/rooms` | Bearer | List all rooms |
@@ -267,6 +274,7 @@ Base URL: `http://localhost:8000/api/v1`
 | DELETE | `/rooms/{id}` | Admin | Soft-delete room |
 
 ### Loans
+
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
 | GET | `/loans` | Bearer | List loans (admin=all, borrower=own) |
@@ -333,6 +341,7 @@ cp .env.example .env     # macOS/Linux
 ```
 
 **Development `.env`:**
+
 ```env
 DATABASE_URL=sqlite:///./sipinjam.db
 SECRET_KEY=your-super-secret-key-at-least-32-characters-long
@@ -343,6 +352,7 @@ BACKEND_CORS_ORIGINS=["http://localhost:5173","http://localhost:3000"]
 ```
 
 **Production `.env` (Turso LibSQL):**
+
 ```env
 DATABASE_URL=libsql://your-database.turso.io?authToken=YOUR_TURSO_TOKEN
 SECRET_KEY=production-secret-key-very-long-and-random
@@ -379,10 +389,11 @@ python -m uvicorn app.main:app --reload
 ```
 
 The API will be available at:
-- **API**: http://localhost:8000/api/v1
-- **Swagger UI**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
-- **Health**: http://localhost:8000/health
+
+- **API**: <http://localhost:8000/api/v1>
+- **Swagger UI**: <http://localhost:8000/docs>
+- **ReDoc**: <http://localhost:8000/redoc>
+- **Health**: <http://localhost:8000/health>
 
 ### Database Migrations (Alembic)
 
@@ -410,13 +421,14 @@ cd apps/frontend
 npm run dev
 ```
 
-Frontend will be available at **http://localhost:5173**
+Frontend will be available at **<http://localhost:5173>**
 
 ### Default Credentials
 
 Register via the API or UI. To create an admin account, register with `"role": "ADMIN"` in the request body.
 
 **Quick admin setup via API:**
+
 ```bash
 curl -X POST http://localhost:8000/api/v1/auth/register \
   -H "Content-Type: application/json" \
@@ -483,6 +495,7 @@ npm run build
 ```
 
 Set environment variable:
+
 ```env
 VITE_API_URL=https://your-backend-api.com/api/v1
 ```
