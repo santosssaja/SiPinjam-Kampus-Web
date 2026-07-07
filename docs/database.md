@@ -14,27 +14,28 @@
 4. [Tabel: `items`](#4-tabel-items)
 5. [Tabel: `rooms`](#5-tabel-rooms)
 6. [Tabel: `loans`](#6-tabel-loans)
-7. [Enum & Nilai Tetap](#7-enum--nilai-tetap)
-8. [Relasi Antar Tabel](#8-relasi-antar-tabel)
-9. [Indeks](#9-indeks)
-10. [Logika Bisnis Berbasis Database](#10-logika-bisnis-berbasis-database)
-11. [Migrasi dengan Alembic](#11-migrasi-dengan-alembic)
-12. [Konfigurasi Koneksi](#12-konfigurasi-koneksi)
-13. [Contoh Query Penting](#13-contoh-query-penting)
+7. [Tabel: `images` (Penyimpanan File)](#7-tabel-images-penyimpanan-file)
+8. [Enum & Nilai Tetap](#8-enum--nilai-tetap)
+9. [Relasi Antar Tabel](#9-relasi-antar-tabel)
+10. [Indeks](#10-indeks)
+11. [Logika Bisnis Berbasis Database](#11-logika-bisnis-berbasis-database)
+12. [Migrasi dengan Alembic](#12-migrasi-dengan-alembic)
+13. [Konfigurasi Koneksi](#13-konfigurasi-koneksi)
+14. [Contoh Query Penting](#14-contoh-query-penting)
 
 ---
 
 ## 1. Ringkasan Skema
 
 ```
-┌──────────┐        ┌──────────┐        ┌──────────┐
-│  users   │        │  items   │        │  rooms   │
-│──────────│        │──────────│        │──────────│
-│ id  (PK) │        │ id  (PK) │        │ id  (PK) │
-│ name     │        │ code     │        │ code     │
-│ email    │        │ name     │        │ name     │
-│ password │        │ quantity │        │ capacity │
-│ role     │        │ descript.│        │ descript.│
+┌──────────┐        ┌──────────┐        ┌──────────┐        ┌──────────┐
+│  users   │        │  items   │        │  rooms   │        │  images  │
+│──────────│        │──────────│        │──────────│        │──────────│
+│ id  (PK) │        │ id  (PK) │        │ id  (PK) │        │ id  (PK) │
+│ name     │        │ code     │        │ code     │        │ data     │
+│ email    │        │ name     │        │ name     │        │ type     │
+│ password │        │ quantity │        │ capacity │        └──────────┘
+│ role     │        │ image_url│        │ image_url│
 │ is_active│        │ is_active│        │ is_active│
 │ created  │        │ created  │        │ created  │
 └────┬─────┘        └──────────┘        └──────────┘
@@ -111,6 +112,12 @@ erDiagram
         int approved_by FK
         datetime created_at
         datetime updated_at
+    }
+
+    images {
+        int id PK
+        blob data
+        string content_type
     }
 
     users ||--o{ loans : "mengajukan (borrower_id)"
@@ -319,7 +326,34 @@ Kolom ini menggunakan pola *Generic Foreign Key* (tanpa FK constraint database).
 
 ---
 
-## 7. Enum & Nilai Tetap
+## 7. Tabel: `images` (Penyimpanan File)
+
+Digunakan untuk menyimpan gambar secara native ke dalam *database* (sebagai binary BLOB) setelah melalui proses kompresi. Hal ini memastikan aplikasi *stateless* dan tidak bergantung pada *file system* lokal (penting untuk deployment PaaS/Serverless seperti Turso & Railway).
+
+**DDL (SQL):**
+
+```sql
+CREATE TABLE images (
+    id            INTEGER      PRIMARY KEY AUTOINCREMENT,
+    data          BLOB         NOT NULL,
+    content_type  VARCHAR(50)  NOT NULL
+);
+```
+
+**Penjelasan Kolom:**
+
+| Kolom | Tipe | Null | Default | Keterangan |
+|-------|------|------|---------|------------|
+| `id` | INTEGER | NO | auto | Primary key |
+| `data` | BLOB | NO | — | Data *binary* dari gambar JPEG yang sudah dikompres |
+| `content_type` | VARCHAR(50)| NO | — | MIME type file (contoh: `image/jpeg`) |
+
+**Aturan:**
+- *Items* dan *Rooms* tidak menggunakan *Foreign Key* langsung ke `images`, melainkan hanya menyimpan string referensi URL (`/api/v1/uploads/image/{id}`) pada kolom `image_url` masing-masing.
+
+---
+
+## 8. Enum & Nilai Tetap
 
 Semua enum disimpan sebagai `VARCHAR` di database (bukan tipe ENUM native).
 
@@ -350,7 +384,7 @@ Semua enum disimpan sebagai `VARCHAR` di database (bukan tipe ENUM native).
 
 ---
 
-## 8. Relasi Antar Tabel
+## 9. Relasi Antar Tabel
 
 | Relasi | Tipe | Kolom |
 |--------|------|-------|
@@ -363,7 +397,7 @@ Semua enum disimpan sebagai `VARCHAR` di database (bukan tipe ENUM native).
 
 ---
 
-## 9. Indeks
+## 10. Indeks
 
 | Tabel | Kolom | Tipe Indeks | Alasan |
 |-------|-------|-------------|--------|
@@ -380,9 +414,9 @@ Semua enum disimpan sebagai `VARCHAR` di database (bukan tipe ENUM native).
 
 ---
 
-## 10. Logika Bisnis Berbasis Database
+## 11. Logika Bisnis Berbasis Database
 
-### 10.1 Deteksi Konflik Jadwal
+### 11.1 Deteksi Konflik Jadwal
 
 Diimplementasikan di [`LoanRepository.get_conflicting_loans()`](../app/repositories/loan_repository.py).
 
@@ -407,7 +441,7 @@ WHERE resource_type = :resource_type
   AND id           != :exclude_loan_id;  -- digunakan saat re-check approve
 ```
 
-### 10.2 Validasi Kuantitas Item
+### 11.2 Validasi Kuantitas Item
 
 Untuk `resource_type = 'ITEM'`, sistem menghitung jumlah loan `APPROVED` yang tumpang tindih:
 
@@ -424,17 +458,17 @@ WHERE resource_type = 'ITEM'
 
 Jika hasilnya `>= item.quantity`, permintaan baru ditolak dengan `409 Conflict`.
 
-### 10.3 Pencegahan Double-Booking Ruangan
+### 11.3 Pencegahan Double-Booking Ruangan
 
 Untuk `resource_type = 'ROOM'`, cukup satu loan `APPROVED` yang overlap sudah memblokir permintaan baru — karena ruangan hanya bisa digunakan oleh satu pihak dalam satu waktu.
 
-### 10.4 Re-Check saat Approve
+### 11.4 Re-Check saat Approve
 
 Saat admin menyetujui loan, `BorrowingService.approve_loan()` memanggil ulang `detect_conflict()` dengan `exclude_loan_id=loan.id` untuk mencegah race condition dari dua admin yang menyetujui loan berbeda untuk slot yang sama secara bersamaan.
 
 ---
 
-## 11. Migrasi dengan Alembic
+## 12. Migrasi dengan Alembic
 
 **Struktur file:**
 
@@ -473,7 +507,7 @@ alembic current
 
 ---
 
-## 12. Konfigurasi Koneksi
+## 13. Konfigurasi Koneksi
 
 Koneksi database dikontrol via environment variable `DATABASE_URL` di file `.env`.
 
@@ -518,7 +552,7 @@ SQLModel.metadata.create_all(engine)
 
 ---
 
-## 13. Contoh Query Penting
+## 14. Contoh Query Penting
 
 ### Semua loan oleh peminjam tertentu
 
