@@ -28,6 +28,12 @@ export default function RegisterPage() {
     e.preventDefault()
     setError('')
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(form.email)) {
+      setError('Format email tidak valid')
+      return
+    }
+
     if (form.password !== confirmPassword) {
       setError('Password dan konfirmasi password tidak cocok')
       return
