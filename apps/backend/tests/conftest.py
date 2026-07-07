@@ -17,9 +17,15 @@ from app.services.item_service import ItemService
 from app.services.room_service import RoomService
 
 
+from app.core.rate_limit import limiter
+
 @pytest.fixture(name="session")
 def session_fixture():
     """In-memory SQLite session for each test."""
+    
+    # Disable rate limiting for tests
+    limiter.enabled = False
+
     engine = create_engine(
         "sqlite://",
         connect_args={"check_same_thread": False},

@@ -22,11 +22,21 @@ class ItemRepository:
         return self._session.exec(stmt).first()
 
     def get_all(
-        self, skip: int = 0, limit: int = 100, active_only: bool = True
+        self, 
+        skip: int = 0, 
+        limit: int = 100, 
+        active_only: bool = True,
+        search: Optional[str] = None,
+        category: Optional[str] = None
     ) -> list[Item]:
         stmt = select(Item)
         if active_only:
             stmt = stmt.where(Item.is_active == True)  # noqa: E712
+        if search:
+            stmt = stmt.where(Item.name.ilike(f"%{search}%"))
+        if category:
+            stmt = stmt.where(Item.category == category)
+            
         stmt = stmt.offset(skip).limit(limit)
         return list(self._session.exec(stmt).all())
 

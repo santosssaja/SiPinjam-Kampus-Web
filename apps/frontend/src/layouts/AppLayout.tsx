@@ -1,14 +1,18 @@
 import React, { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import { LayoutDashboard, Package, Building2, Calendar, ClipboardList, Clock, Settings, LogOut, Menu, X, ScanLine } from 'lucide-react'
+import { cn } from '../lib/utils'
 
 const navItems = [
-  { to: '/dashboard', label: 'Dashboard', icon: '📊', roles: ['ADMIN', 'BORROWER'] },
-  { to: '/items', label: 'Peralatan', icon: '🔬', roles: ['ADMIN', 'BORROWER'] },
-  { to: '/rooms', label: 'Ruangan', icon: '🏫', roles: ['ADMIN', 'BORROWER'] },
-  { to: '/loans/new', label: 'Ajukan Pinjam', icon: '📋', roles: ['BORROWER'] },
-  { to: '/loans', label: 'Riwayat Pinjam', icon: '📜', roles: ['ADMIN', 'BORROWER'] },
-  { to: '/admin/loans', label: 'Kelola Peminjaman', icon: '⚙️', roles: ['ADMIN'] },
+  { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['ADMIN', 'BORROWER'] },
+  { to: '/items', label: 'Katalog Peralatan', icon: Package, roles: ['ADMIN', 'BORROWER'] },
+  { to: '/rooms', label: 'Ruangan', icon: Building2, roles: ['ADMIN', 'BORROWER'] },
+  { to: '/calendar', label: 'Kalender', icon: Calendar, roles: ['ADMIN', 'BORROWER'] },
+  { to: '/loans/new', label: 'Ajukan Pinjam', icon: ClipboardList, roles: ['BORROWER'] },
+  { to: '/loans', label: 'Riwayat Pinjam', icon: Clock, roles: ['ADMIN', 'BORROWER'] },
+  { to: '/scanner', label: 'QR Scanner', icon: ScanLine, roles: ['ADMIN'] },
+  { to: '/admin/loans', label: 'Kelola Peminjaman', icon: Settings, roles: ['ADMIN'] },
 ]
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -26,103 +30,126 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   )
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
+    <div className="flex h-screen bg-slate-50 overflow-hidden font-sans">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden transition-opacity"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`
-          fixed lg:static inset-y-0 left-0 z-30
-          w-64 bg-white border-r border-gray-200 flex flex-col
-          transform transition-transform duration-200 ease-in-out
-          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-        `}
+        className={cn(
+          "fixed lg:static inset-y-0 left-0 z-50",
+          "w-64 bg-white border-r border-slate-200 flex flex-col",
+          "transform transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]",
+          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+        )}
       >
         {/* Logo */}
-        <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-200">
-          <div className="w-9 h-9 rounded-lg bg-primary-600 flex items-center justify-center text-white font-bold text-sm">
-            SP
+        <div className="flex items-center justify-between px-6 py-6 border-b border-slate-100">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-sm shadow-blue-600/20">
+              SP
+            </div>
+            <div>
+              <div className="font-bold text-slate-900 text-sm tracking-tight leading-none">SiPinjam</div>
+              <div className="text-xs text-slate-500 font-medium mt-1">Kampus</div>
+            </div>
           </div>
-          <div>
-            <div className="font-bold text-gray-900 text-sm leading-tight">SiPinjam</div>
-            <div className="text-xs text-gray-500">Kampus</div>
-          </div>
+          <button 
+            onClick={() => setSidebarOpen(false)}
+            className="lg:hidden text-slate-400 hover:text-slate-600"
+          >
+            <X size={20} />
+          </button>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-          {filteredNav.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              onClick={() => setSidebarOpen(false)}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-primary-50 text-primary-700'
-                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                }`
-              }
-            >
-              <span className="text-base">{item.icon}</span>
-              {item.label}
-            </NavLink>
-          ))}
+        <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto scrollbar-hide">
+          {filteredNav.map((item) => {
+            const Icon = item.icon
+            return (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                onClick={() => setSidebarOpen(false)}
+                className={({ isActive }) =>
+                  cn(
+                    "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group",
+                    isActive
+                      ? "bg-blue-50 text-blue-700"
+                      : "text-slate-600 hover:bg-slate-100/80 hover:text-slate-900"
+                  )
+                }
+              >
+                {({ isActive }) => (
+                  <>
+                    <Icon size={18} className={cn("transition-colors", isActive ? "text-blue-600" : "text-slate-400 group-hover:text-slate-600")} />
+                    {item.label}
+                  </>
+                )}
+              </NavLink>
+            )
+          })}
         </nav>
 
         {/* User info */}
-        <div className="px-4 py-4 border-t border-gray-200">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-semibold text-sm">
+        <div className="p-4 border-t border-slate-100">
+          <div className="flex items-center gap-3 mb-4 px-2">
+            <div className="w-9 h-9 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 font-semibold text-sm">
               {user?.name?.[0]?.toUpperCase() ?? 'U'}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium text-gray-900 truncate">{user?.name}</div>
-              <div className="text-xs text-gray-500 truncate">{user?.email}</div>
+              <div className="text-sm font-semibold text-slate-900 truncate">{user?.name}</div>
+              <div className="text-xs text-slate-500 truncate">{user?.email}</div>
             </div>
           </div>
-          <div className="flex items-center justify-between">
-            <span className={isAdmin ? 'badge-admin' : 'badge-borrower'}>
+          <div className="flex items-center justify-between px-2">
+            <span className={cn(
+              "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
+              isAdmin ? "bg-purple-100 text-purple-800 border border-purple-200" : "bg-blue-100 text-blue-800 border border-blue-200"
+            )}>
               {user?.role}
             </span>
             <button
               onClick={handleLogout}
               id="logout-btn"
-              className="text-xs text-gray-500 hover:text-red-600 transition-colors"
+              className="text-slate-400 hover:text-red-600 transition-colors p-1.5 rounded-lg hover:bg-red-50"
+              title="Logout"
             >
-              Keluar
+              <LogOut size={16} />
             </button>
           </div>
         </div>
       </aside>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top bar */}
-        <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3 lg:px-6">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="lg:hidden p-1.5 rounded-lg hover:bg-gray-100"
-            aria-label="Open menu"
-          >
-            <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-          <div className="text-sm text-gray-500">
-            Selamat datang, <span className="font-medium text-gray-900">{user?.name}</span>
+      <div className="flex-1 flex flex-col overflow-hidden relative">
+        {/* Top bar (Mobile only for cleaner desktop look) */}
+        <header className="lg:hidden bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-30">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="p-2 -ml-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors"
+              aria-label="Open menu"
+            >
+              <Menu size={20} />
+            </button>
+            <div className="font-semibold text-slate-900 text-sm">SiPinjam</div>
+          </div>
+          <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 font-semibold text-xs">
+            {user?.name?.[0]?.toUpperCase() ?? 'U'}
           </div>
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto p-4 lg:p-6">
-          {children}
+        <main className="flex-1 overflow-y-auto p-4 md:p-8">
+          <div className="mx-auto max-w-6xl">
+            {children}
+          </div>
         </main>
       </div>
     </div>

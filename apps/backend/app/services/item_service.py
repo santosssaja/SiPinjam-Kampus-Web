@@ -14,8 +14,14 @@ class ItemService:
     def __init__(self, item_repo: ItemRepository) -> None:
         self._repo = item_repo
 
-    def get_all(self, skip: int = 0, limit: int = 100) -> list[Item]:
-        return self._repo.get_all(skip=skip, limit=limit)
+    def get_all(
+        self, 
+        skip: int = 0, 
+        limit: int = 100,
+        search: str | None = None,
+        category: str | None = None
+    ) -> list[Item]:
+        return self._repo.get_all(skip=skip, limit=limit, search=search, category=category)
 
     def get_by_id(self, item_id: int) -> Item:
         item = self._repo.get_by_id(item_id)

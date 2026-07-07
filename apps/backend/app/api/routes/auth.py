@@ -1,6 +1,7 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
+from app.core.rate_limit import limiter
 
 from app.api.deps import CurrentUser, get_auth_service
 from app.schemas.user import TokenResponse, UserRegister, UserLogin, UserResponse
@@ -10,7 +11,9 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
 @router.post("/register", response_model=UserResponse, status_code=201)
+@limiter.limit("100/minute")
 def register(
+    request: Request,
     data: UserRegister,
     auth_service: Annotated[AuthService, Depends(get_auth_service)],
 ):
@@ -20,7 +23,9 @@ def register(
 
 
 @router.post("/login", response_model=TokenResponse)
+@limiter.limit("100/minute")
 def login(
+    request: Request,
     data: UserLogin,
     auth_service: Annotated[AuthService, Depends(get_auth_service)],
 ):

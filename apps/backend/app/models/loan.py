@@ -36,6 +36,11 @@ class Loan(SQLModel, table=True):
         default=None, foreign_key="users.id", nullable=True
     )
 
+    # Return & Fine tracking
+    actual_return_time: Optional[datetime] = Field(default=None)
+    fine_amount: int = Field(default=0)
+    is_fine_paid: bool = Field(default=False)
+
     created_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc)
     )

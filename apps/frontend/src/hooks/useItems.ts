@@ -4,10 +4,10 @@ import { ItemCreateRequest, ItemUpdateRequest } from '../types'
 
 export const ITEMS_KEY = ['items']
 
-export function useItems() {
+export function useItems(params?: any) {
   return useQuery({
-    queryKey: ITEMS_KEY,
-    queryFn: () => itemService.getAll(),
+    queryKey: [...ITEMS_KEY, params],
+    queryFn: () => itemService.getAll(params),
   })
 }
 

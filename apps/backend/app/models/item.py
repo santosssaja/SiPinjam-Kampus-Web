@@ -20,6 +20,8 @@ class Item(SQLModel, table=True):
     name: str = Field(max_length=200, index=True)
     quantity: int = Field(ge=0, default=1)
     description: Optional[str] = Field(default=None, max_length=1000)
+    category: Optional[str] = Field(default=None, max_length=100)
+    image_url: Optional[str] = Field(default=None, max_length=500)
     created_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc)
     )

@@ -16,6 +16,8 @@ class ItemCreate(BaseModel):
     name: str
     quantity: int
     description: Optional[str] = None
+    category: Optional[str] = None
+    image_url: Optional[str] = None
 
     @field_validator("quantity")
     @classmethod
@@ -40,6 +42,8 @@ class ItemUpdate(BaseModel):
     name: Optional[str] = None
     quantity: Optional[int] = None
     description: Optional[str] = None
+    category: Optional[str] = None
+    image_url: Optional[str] = None
     is_active: Optional[bool] = None
 
     @field_validator("quantity")
@@ -63,6 +67,8 @@ class ItemResponse(BaseModel):
     name: str
     quantity: int
     description: Optional[str]
+    category: Optional[str]
+    image_url: Optional[str]
     is_active: bool
     created_at: datetime
 

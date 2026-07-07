@@ -16,6 +16,8 @@ class RoomCreate(BaseModel):
     name: str
     capacity: int
     description: Optional[str] = None
+    location: Optional[str] = None
+    image_url: Optional[str] = None
 
     @field_validator("capacity")
     @classmethod
@@ -40,6 +42,8 @@ class RoomUpdate(BaseModel):
     name: Optional[str] = None
     capacity: Optional[int] = None
     description: Optional[str] = None
+    location: Optional[str] = None
+    image_url: Optional[str] = None
     is_active: Optional[bool] = None
 
     @field_validator("capacity")
@@ -63,6 +67,8 @@ class RoomResponse(BaseModel):
     name: str
     capacity: int
     description: Optional[str]
+    location: Optional[str]
+    image_url: Optional[str]
     is_active: bool
     created_at: datetime
 

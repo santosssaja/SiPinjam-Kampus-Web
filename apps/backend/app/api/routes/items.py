@@ -15,11 +15,13 @@ ItemServiceDep = Annotated[ItemService, Depends(get_item_service)]
 def list_items(
     skip: int = 0,
     limit: int = 100,
+    search: str | None = None,
+    category: str | None = None,
     item_service: ItemServiceDep = None,  # type: ignore[assignment]
     current_user: CurrentUser = None,  # type: ignore[assignment]
 ):
     """List all active items. Accessible by any authenticated user."""
-    return item_service.get_all(skip=skip, limit=limit)
+    return item_service.get_all(skip=skip, limit=limit, search=search, category=category)
 
 
 @router.get("/{item_id}", response_model=ItemResponse)

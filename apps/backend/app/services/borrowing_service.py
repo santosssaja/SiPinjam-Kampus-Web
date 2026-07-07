@@ -184,8 +184,27 @@ class BorrowingService:
                 detail=f"Cannot complete a loan with status '{loan.status.value}'",
             )
 
+        now = datetime.now(timezone.utc)
         loan.status = LoanStatus.COMPLETED
-        loan.updated_at = datetime.now(timezone.utc)
+        loan.updated_at = now
+        loan.actual_return_time = now
+
+        # Calculate fine (e.g., 10000 IDR per hour late)
+        # Using naive local time for expected return to simplify, 
+        # but better to assume date and end_time are in local tz and compare with local now.
+        local_now = datetime.now()
+        expected_return = datetime.combine(loan.date, loan.end_time)
+        
+        if local_now > expected_return:
+            delay_seconds = (local_now - expected_return).total_seconds()
+            delay_hours = delay_seconds / 3600
+            
+            # 10,000 IDR per hour or partial hour
+            import math
+            loan.fine_amount = math.ceil(delay_hours) * 10000
+        else:
+            loan.fine_amount = 0
+
         return self._loan_repo.update(loan)
 
     def check_availability(

@@ -1,13 +1,14 @@
 import { LoanStatus } from '../types'
+import { Badge } from './ui/Badge'
 
-const STATUS_CONFIG: Record<LoanStatus, { label: string; className: string }> = {
-  PENDING: { label: 'Menunggu', className: 'badge-pending' },
-  APPROVED: { label: 'Disetujui', className: 'badge-approved' },
-  REJECTED: { label: 'Ditolak', className: 'badge-rejected' },
-  COMPLETED: { label: 'Selesai', className: 'badge-completed' },
+const STATUS_CONFIG: Record<LoanStatus, { label: string; variant: 'default' | 'success' | 'warning' | 'danger' | 'info' }> = {
+  PENDING: { label: 'Menunggu', variant: 'warning' },
+  APPROVED: { label: 'Disetujui', variant: 'success' },
+  REJECTED: { label: 'Ditolak', variant: 'danger' },
+  COMPLETED: { label: 'Selesai', variant: 'default' },
 }
 
 export default function StatusBadge({ status }: { status: LoanStatus }) {
-  const config = STATUS_CONFIG[status]
-  return <span className={config.className}>{config.label}</span>
+  const config = STATUS_CONFIG[status] || { label: status, variant: 'default' }
+  return <Badge variant={config.variant}>{config.label}</Badge>
 }

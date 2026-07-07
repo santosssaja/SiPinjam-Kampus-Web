@@ -3,74 +3,101 @@ import { useLoans } from '../hooks/useLoans'
 import { PageLoader } from '../components/LoadingSpinner'
 import StatusBadge from '../components/StatusBadge'
 import { Loan } from '../types'
+import { Card, CardContent } from '../components/ui/Card'
+import { Button } from '../components/ui/Button'
+import { Plus, History, Calendar, Clock as ClockIcon } from 'lucide-react'
+import { cn } from '../lib/utils'
 
 export default function LoanHistoryPage() {
   const { data: loans, isLoading } = useLoans()
 
-  if (isLoading) return <PageLoader />
+  if (isLoading && !loans) return <PageLoader />
 
   return (
-    <div>
-      <div className="page-header flex items-start justify-between">
+    <div className="space-y-6 animate-in fade-in duration-500">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="page-title">Riwayat Peminjaman</h1>
-          <p className="page-subtitle">Semua peminjaman yang pernah Anda ajukan</p>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Riwayat Peminjaman</h1>
+          <p className="text-slate-500 mt-1 text-sm">Semua peminjaman yang pernah Anda ajukan.</p>
         </div>
-        <Link to="/loans/new" id="new-loan-btn" className="btn-primary">
-          + Ajukan Baru
+        <Link to="/loans/new">
+          <Button id="new-loan-btn" className="whitespace-nowrap">
+            <Plus size={16} className="mr-2" />
+            Ajukan Peminjaman
+          </Button>
         </Link>
       </div>
 
-      <div className="card">
-        {!loans || loans.length === 0 ? (
-          <div className="card-body text-center text-gray-400 py-12">
-            <p className="text-2xl mb-3">📋</p>
-            <p>Belum ada riwayat peminjaman</p>
-            <Link to="/loans/new" className="btn-primary btn-sm mt-4 inline-flex">
-              Ajukan Peminjaman Pertama
-            </Link>
-          </div>
-        ) : (
-          <div className="table-container rounded-none border-0">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Jenis</th>
-                  <th>ID Sumber</th>
-                  <th>Tanggal</th>
-                  <th>Waktu</th>
-                  <th>Tujuan</th>
-                  <th>Status</th>
-                  <th>Diajukan</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loans.map((loan: Loan) => (
-                  <tr key={loan.id}>
-                    <td className="font-mono text-xs text-gray-400">#{loan.id}</td>
-                    <td>
-                      <span className={loan.resource_type === 'ITEM' ? 'badge-item' : 'badge-room'}>
-                        {loan.resource_type === 'ITEM' ? 'Peralatan' : 'Ruangan'}
-                      </span>
-                    </td>
-                    <td className="text-sm text-gray-500">{loan.resource_id}</td>
-                    <td className="text-sm">{loan.date}</td>
-                    <td className="text-xs text-gray-500 whitespace-nowrap">
-                      {loan.start_time.slice(0, 5)} – {loan.end_time.slice(0, 5)}
-                    </td>
-                    <td className="text-sm max-w-[180px] truncate">{loan.purpose}</td>
-                    <td><StatusBadge status={loan.status} /></td>
-                    <td className="text-xs text-gray-400">
-                      {new Date(loan.created_at).toLocaleDateString('id-ID')}
-                    </td>
+      <Card>
+        <CardContent className="p-0">
+          {!loans || loans.length === 0 ? (
+            <div className="text-center text-slate-500 py-16 flex flex-col items-center">
+              <History size={48} className="text-slate-300 mb-4" strokeWidth={1} />
+              <p className="font-medium text-slate-600">Belum ada riwayat peminjaman</p>
+              <p className="text-sm mt-1 mb-6">Ajukan peminjaman pertama Anda sekarang.</p>
+              <Link to="/loans/new">
+                <Button variant="secondary">Mulai Peminjaman</Button>
+              </Link>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-slate-50/50 text-slate-500 font-medium">
+                  <tr>
+                    <th className="px-6 py-4 rounded-tl-xl">ID</th>
+                    <th className="px-6 py-4">Peminjaman</th>
+                    <th className="px-6 py-4">Waktu</th>
+                    <th className="px-6 py-4">Tujuan</th>
+                    <th className="px-6 py-4">Status</th>
+                    <th className="px-6 py-4 rounded-tr-xl">Diajukan Pada</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {loans.map((loan: Loan) => (
+                    <tr key={loan.id} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="px-6 py-4 font-mono text-xs text-slate-500">
+                        #{loan.id}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                          <span className={cn(
+                            "inline-flex items-center px-2 py-1 rounded-md text-xs font-medium",
+                            loan.resource_type === 'ITEM' ? 'bg-orange-50 text-orange-700 border border-orange-200/50' : 'bg-teal-50 text-teal-700 border border-teal-200/50'
+                          )}>
+                            {loan.resource_type === 'ITEM' ? 'Peralatan' : 'Ruangan'}
+                          </span>
+                          <span className="text-slate-500 text-xs">ID: {loan.resource_id}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-center gap-1.5 text-slate-900 font-medium">
+                            <Calendar size={14} className="text-slate-400" />
+                            {loan.date}
+                          </div>
+                          <div className="flex items-center gap-1.5 text-slate-500 text-xs">
+                            <ClockIcon size={14} className="text-slate-400" />
+                            {loan.start_time.slice(0, 5)} – {loan.end_time.slice(0, 5)}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-slate-700 max-w-[200px] truncate" title={loan.purpose}>
+                        {loan.purpose}
+                      </td>
+                      <td className="px-6 py-4">
+                        <StatusBadge status={loan.status} />
+                      </td>
+                      <td className="px-6 py-4 text-xs text-slate-400">
+                        {new Date(loan.created_at).toLocaleDateString('id-ID')}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

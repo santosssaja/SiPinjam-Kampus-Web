@@ -1,6 +1,7 @@
-from typing import List
+from typing import List, Union, Any
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
+from pydantic import field_validator
+import json
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
@@ -9,6 +10,7 @@ class Settings(BaseSettings):
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=False,
+        extra="ignore"
     )
 
     # Application
@@ -17,18 +19,27 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
 
     # Security
-    SECRET_KEY: str = "changeme-super-secret-key-min-32-chars-long"
+    SECRET_KEY: str
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440  # 24 hours
 
     # Database
-    DATABASE_URL: str = "sqlite:///./sipinjam.db"
+    DATABASE_URL: str
 
     # CORS
-    BACKEND_CORS_ORIGINS: List[str] = [
-        "http://localhost:5173",
-        "http://localhost:3000",
-    ]
+    BACKEND_CORS_ORIGINS: List[str] = []
+
+    @field_validator("BACKEND_CORS_ORIGINS", mode="before")
+    @classmethod
+    def assemble_cors_origins(cls, v: Any) -> List[str]:
+        if isinstance(v, str) and not v.startswith("["):
+            return [i.strip() for i in v.split(",") if i.strip()]
+        elif isinstance(v, str):
+            try:
+                return json.loads(v)
+            except json.JSONDecodeError:
+                pass
+        return v
 
     @property
     def is_production(self) -> bool:

@@ -80,6 +80,9 @@ class LoanResponse(BaseModel):
     purpose: str
     status: LoanStatus
     approved_by: Optional[int]
+    actual_return_time: Optional[datetime] = None
+    fine_amount: int = 0
+    is_fine_paid: bool = False
     created_at: datetime
     updated_at: Optional[datetime]
 

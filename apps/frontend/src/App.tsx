@@ -12,6 +12,8 @@ import RoomsPage from './pages/RoomsPage'
 import LoanRequestPage from './pages/LoanRequestPage'
 import LoanHistoryPage from './pages/LoanHistoryPage'
 import AdminApprovalPage from './pages/AdminApprovalPage'
+import CalendarPage from './pages/CalendarPage'
+import ScannerPage from './pages/ScannerPage'
 
 export default function App() {
   return (
@@ -27,6 +29,7 @@ export default function App() {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/items" element={<ItemsPage />} />
             <Route path="/rooms" element={<RoomsPage />} />
+            <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/loans" element={<LoanHistoryPage />} />
             <Route path="/loans/new" element={<LoanRequestPage />} />
           </Route>
@@ -34,6 +37,7 @@ export default function App() {
           {/* Admin only */}
           <Route element={<AdminRoute />}>
             <Route path="/admin/loans" element={<AdminApprovalPage />} />
+            <Route path="/scanner" element={<ScannerPage />} />
           </Route>
 
           {/* Default redirect */}

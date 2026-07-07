@@ -34,6 +34,9 @@ SiPinjam Kampus solves critical pain points in campus resource management:
 | Double-booked rooms | Service-layer conflict detection with time-window overlap algorithm |
 | Approval mistakes | Structured PENDING → APPROVED/REJECTED → COMPLETED workflow |
 | Poor history management | Searchable, filterable loan history per user |
+| Manual return processing | Integrated QR/Barcode Scanner (`html5-qrcode`) for quick return |
+| Visualizing schedules | Interactive Calendar View (`react-big-calendar`) |
+| Unappealing UI | Modern, responsive SaaS design with soft UI aesthetics |
 
 ---
 
@@ -91,7 +94,8 @@ SiPinjam Kampus Web/
 │   │   │   │       ├── auth.py         # POST /auth/register, /login, GET /me
 │   │   │   │       ├── items.py        # CRUD /items
 │   │   │   │       ├── rooms.py        # CRUD /rooms
-│   │   │   │       └── loans.py        # /loans + approval workflow
+│   │   │   │       ├── loans.py        # /loans + approval workflow
+│   │   │   │       └── uploads.py      # /uploads/image endpoint
 │   │   │   ├── core/
 │   │   │   │   ├── config.py           # Pydantic Settings (env-based)
 │   │   │   │   └── security.py        # JWT + bcrypt
@@ -140,7 +144,9 @@ SiPinjam Kampus Web/
 │       │   │   ├── RoomsPage.tsx
 │       │   │   ├── LoanRequestPage.tsx
 │       │   │   ├── LoanHistoryPage.tsx
-│       │   │   └── AdminApprovalPage.tsx
+│       │   │   ├── AdminApprovalPage.tsx
+│       │   │   ├── CalendarPage.tsx    # Visual schedule view
+│       │   │   └── ScannerPage.tsx     # QR Scanner for quick returns
 │       │   ├── components/
 │       │   │   ├── LoadingSpinner.tsx
 │       │   │   ├── StatusBadge.tsx
@@ -155,7 +161,8 @@ SiPinjam Kampus Web/
 │       │   │   ├── authService.ts
 │       │   │   ├── itemService.ts
 │       │   │   ├── roomService.ts
-│       │   │   └── loanService.ts
+│       │   │   ├── loanService.ts
+│       │   │   └── uploadService.ts    # File uploads api client
 │       │   ├── layouts/
 │       │   │   └── AppLayout.tsx       # Responsive sidebar layout
 │       │   ├── routes/
@@ -203,6 +210,8 @@ SiPinjam Kampus Web/
 | name | string | Equipment name |
 | quantity | int | Total available units |
 | description | string? | Optional description |
+| category | string? | Item category |
+| image_url | string? | Link to uploaded item image |
 
 ### Room
 
@@ -212,6 +221,8 @@ SiPinjam Kampus Web/
 | code | string | Unique room code (e.g. R101) |
 | name | string | Room name |
 | capacity | int | Max occupants |
+| location | string? | Room location/building |
+| image_url | string? | Link to uploaded room image |
 
 ### Loan
 
@@ -284,6 +295,12 @@ Base URL: `http://localhost:8000/api/v1`
 | POST | `/loans/{id}/reject` | Admin | Reject loan |
 | POST | `/loans/{id}/complete` | Admin | Complete loan |
 | GET | `/loans/availability` | Bearer | Check time slot availability |
+
+### Uploads
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/uploads/image` | Bearer | Upload an image file for item/room |
 
 ---
 

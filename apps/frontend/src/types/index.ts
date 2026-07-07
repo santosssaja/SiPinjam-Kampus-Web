@@ -25,6 +25,8 @@ export interface Item {
   name: string
   quantity: number
   description: string | null
+  category: string | null
+  image_url: string | null
   is_active: boolean
   created_at: string
 }
@@ -35,6 +37,8 @@ export interface Room {
   name: string
   capacity: number
   description: string | null
+  location: string | null
+  image_url: string | null
   is_active: boolean
   created_at: string
 }
@@ -75,6 +79,8 @@ export interface ItemCreateRequest {
   name: string
   quantity: number
   description?: string
+  category?: string
+  image_url?: string
 }
 
 export interface ItemUpdateRequest {
@@ -82,6 +88,8 @@ export interface ItemUpdateRequest {
   name?: string
   quantity?: number
   description?: string
+  category?: string
+  image_url?: string
   is_active?: boolean
 }
 
@@ -90,6 +98,8 @@ export interface RoomCreateRequest {
   name: string
   capacity: number
   description?: string
+  location?: string
+  image_url?: string
 }
 
 export interface RoomUpdateRequest {
@@ -97,6 +107,8 @@ export interface RoomUpdateRequest {
   name?: string
   capacity?: number
   description?: string
+  location?: string
+  image_url?: string
   is_active?: boolean
 }
 
@@ -132,4 +144,5 @@ export interface AvailabilityResponse {
 export interface PaginationParams {
   skip?: number
   limit?: number
+  search?: string
 }

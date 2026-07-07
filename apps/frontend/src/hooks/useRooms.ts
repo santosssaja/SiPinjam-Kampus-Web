@@ -4,10 +4,10 @@ import { RoomCreateRequest, RoomUpdateRequest } from '../types'
 
 export const ROOMS_KEY = ['rooms']
 
-export function useRooms() {
+export function useRooms(params?: any) {
   return useQuery({
-    queryKey: ROOMS_KEY,
-    queryFn: () => roomService.getAll(),
+    queryKey: [...ROOMS_KEY, params],
+    queryFn: () => roomService.getAll(params),
   })
 }
 
