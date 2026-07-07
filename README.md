@@ -63,10 +63,6 @@ SiPinjam Kampus solves critical pain points in campus resource management:
 │      ├── services/     Axios API clients                │
 │      ├── routes/       Route guards (Protected/Admin)   │
 │      └── layouts/      AppLayout sidebar                │
-│                                                         │
-│  packages/                                              │
-│  ├── shared-types/     TypeScript type definitions      │
-│  └── shared-utils/     Utility functions                │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -176,10 +172,6 @@ SiPinjam Kampus Web/
 │       ├── vite.config.ts
 │       ├── tailwind.config.js
 │       └── package.json
-│
-├── packages/
-│   ├── shared-types/src/index.ts
-│   └── shared-utils/src/index.ts
 │
 ├── docs/
 ├── package.json                        # Workspace root
@@ -521,4 +513,4 @@ VITE_API_URL=https://your-backend-api.com/api/v1
 
 ## License
 
-MIT License — © 2024 SiPinjam Kampus
+MIT License — © 2026 SiPinjam Kampus
