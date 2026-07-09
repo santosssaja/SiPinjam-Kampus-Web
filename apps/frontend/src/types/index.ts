@@ -54,6 +54,7 @@ export interface Loan {
   purpose: string
   status: LoanStatus
   approved_by: number | null
+  rejection_reason: string | null
   created_at: string
   updated_at: string | null
 }

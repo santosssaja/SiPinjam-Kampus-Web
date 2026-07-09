@@ -130,7 +130,8 @@ def seed_data():
                 end_time=time(10, 0),
                 purpose="Coba kabel untuk di rumah",
                 status=LoanStatus.REJECTED,
-                approved_by=admin.id
+                approved_by=admin.id,
+                rejection_reason="Tidak diizinkan membawa pulang kabel ke rumah, peminjaman dibatasi area kampus."
             )
         ]
         

@@ -28,8 +28,8 @@ export const loanService = {
     return res.data
   },
 
-  async reject(id: number): Promise<Loan> {
-    const res = await apiClient.post<Loan>(`/loans/${id}/reject`)
+  async reject(id: number, rejection_reason: string): Promise<Loan> {
+    const res = await apiClient.post<Loan>(`/loans/${id}/reject`, { rejection_reason })
     return res.data
   },
 

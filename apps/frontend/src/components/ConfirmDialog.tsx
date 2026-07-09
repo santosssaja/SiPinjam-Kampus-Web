@@ -10,6 +10,7 @@ interface ConfirmDialogProps {
   onConfirm: () => void
   onCancel: () => void
   isLoading?: boolean
+  children?: React.ReactNode
 }
 
 export default function ConfirmDialog({
@@ -22,6 +23,7 @@ export default function ConfirmDialog({
   onConfirm,
   onCancel,
   isLoading = false,
+  children,
 }: ConfirmDialogProps) {
   if (!isOpen) return null
 
@@ -40,6 +42,7 @@ export default function ConfirmDialog({
         </div>
         <div className="modal-body">
           <p className="text-sm text-gray-600">{message}</p>
+          {children && <div className="mt-4">{children}</div>}
         </div>
         <div className="modal-footer">
           <button

@@ -36,10 +36,12 @@ export function useApproveLoan() {
 }
 
 export function useRejectLoan() {
-  const qc = useQueryClient()
+  const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (id: number) => loanService.reject(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: LOANS_KEY }),
+    mutationFn: ({ id, reason }: { id: number; reason: string }) => loanService.reject(id, reason),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['loans'] })
+    },
   })
 }
 

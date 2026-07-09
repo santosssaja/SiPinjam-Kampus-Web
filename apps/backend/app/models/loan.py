@@ -35,6 +35,7 @@ class Loan(SQLModel, table=True):
     approved_by: Optional[int] = Field(
         default=None, foreign_key="users.id", nullable=True
     )
+    rejection_reason: Optional[str] = Field(default=None, max_length=500)
 
     # Return & Fine tracking
     actual_return_time: Optional[datetime] = Field(default=None)

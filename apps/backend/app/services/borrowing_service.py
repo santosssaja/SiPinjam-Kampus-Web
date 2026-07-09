@@ -145,7 +145,7 @@ class BorrowingService:
         loan.updated_at = datetime.now(timezone.utc)
         return self._loan_repo.update(loan)
 
-    def reject_loan(self, loan_id: int, admin: User) -> Loan:
+    def reject_loan(self, loan_id: int, admin: User, rejection_reason: str) -> Loan:
         """
         Reject a PENDING loan.
 
@@ -164,6 +164,7 @@ class BorrowingService:
 
         loan.status = LoanStatus.REJECTED
         loan.approved_by = admin.id
+        loan.rejection_reason = rejection_reason
         loan.updated_at = datetime.now(timezone.utc)
         return self._loan_repo.update(loan)
 

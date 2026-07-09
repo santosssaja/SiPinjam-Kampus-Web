@@ -39,6 +39,11 @@ class LoanCreate(BaseModel):
         return v
 
 
+class LoanRejectRequest(BaseModel):
+    """Schema for rejecting a loan with a reason."""
+    
+    rejection_reason: str
+
 # ---------------------------------------------------------------------------
 # Availability Check
 # ---------------------------------------------------------------------------
@@ -80,6 +85,7 @@ class LoanResponse(BaseModel):
     purpose: str
     status: LoanStatus
     approved_by: Optional[int]
+    rejection_reason: Optional[str] = None
     actual_return_time: Optional[datetime] = None
     fine_amount: int = 0
     is_fine_paid: bool = False

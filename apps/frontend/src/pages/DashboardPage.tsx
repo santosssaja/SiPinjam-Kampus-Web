@@ -147,7 +147,16 @@ export default function DashboardPage() {
                       </td>
                       <td className="px-6 py-4 text-slate-700">{loan.date}</td>
                       <td className="px-6 py-4 text-slate-700 max-w-[200px] truncate" title={loan.purpose}>{loan.purpose}</td>
-                      <td className="px-6 py-4"><StatusBadge status={loan.status} /></td>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-col gap-1">
+                          <StatusBadge status={loan.status} />
+                          {loan.rejection_reason && (
+                            <span className="text-[10px] text-red-600 bg-red-50 px-2 py-0.5 rounded-full truncate max-w-[150px]" title={loan.rejection_reason}>
+                              {loan.rejection_reason}
+                            </span>
+                          )}
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

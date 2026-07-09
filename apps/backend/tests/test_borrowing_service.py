@@ -241,7 +241,7 @@ class TestApprovalWorkflow:
         data = make_loan_data(ResourceType.ITEM, item.id)
 
         loan = borrowing_service.create_loan(data, borrower_user)
-        rejected = borrowing_service.reject_loan(loan.id, admin_user)
+        rejected = borrowing_service.reject_loan(loan.id, admin_user, "Barang sedang diservis")
         assert rejected.status == LoanStatus.REJECTED
 
     def test_cannot_approve_already_approved_loan(
@@ -276,7 +276,7 @@ class TestApprovalWorkflow:
         borrowing_service.approve_loan(loan.id, admin_user)
 
         with pytest.raises(HTTPException) as exc_info:
-            borrowing_service.reject_loan(loan.id, admin_user)
+            borrowing_service.reject_loan(loan.id, admin_user, "Batal")
         assert exc_info.value.status_code == 409
 
 
@@ -305,7 +305,7 @@ class TestAdminOnlyEnforcement:
         loan = borrowing_service.create_loan(data, borrower_user)
 
         with pytest.raises(HTTPException) as exc_info:
-            borrowing_service.reject_loan(loan.id, borrower_user)
+            borrowing_service.reject_loan(loan.id, borrower_user, "Batal")
         assert exc_info.value.status_code == 403
 
     def test_borrower_cannot_complete(

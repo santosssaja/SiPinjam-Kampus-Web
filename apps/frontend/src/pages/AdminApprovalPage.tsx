@@ -39,6 +39,7 @@ export default function AdminApprovalPage() {
 
   const [filter, setFilter] = useState<FilterStatus>('PENDING')
   const [action, setAction] = useState<ActionState | null>(null)
+  const [rejectionReason, setRejectionReason] = useState('')
 
   const filtered = (loans ?? []).filter((l: Loan) =>
     filter === 'ALL' ? true : l.status === filter,
@@ -76,7 +77,11 @@ export default function AdminApprovalPage() {
         await approveLoan.mutateAsync(action.loanId)
         toast.success('Peminjaman berhasil disetujui')
       } else if (action.type === 'reject') {
-        await rejectLoan.mutateAsync(action.loanId)
+        if (!rejectionReason.trim()) {
+          toast.error('Alasan penolakan harus diisi')
+          return
+        }
+        await rejectLoan.mutateAsync({ id: action.loanId, reason: rejectionReason })
         toast.success('Peminjaman berhasil ditolak')
       } else {
         await completeLoan.mutateAsync(action.loanId)
@@ -86,6 +91,7 @@ export default function AdminApprovalPage() {
       toast.error(err.response?.data?.detail || 'Terjadi kesalahan')
     } finally {
       setAction(null)
+      setRejectionReason('')
     }
   }
 
@@ -192,7 +198,14 @@ export default function AdminApprovalPage() {
                         {loan.purpose}
                       </td>
                       <td className="px-6 py-4">
-                        <StatusBadge status={loan.status} />
+                        <div className="flex flex-col gap-1">
+                          <StatusBadge status={loan.status} />
+                          {loan.rejection_reason && (
+                            <span className="text-[10px] text-red-600 bg-red-50 px-2 py-0.5 rounded-full truncate max-w-[120px]" title={loan.rejection_reason}>
+                              {loan.rejection_reason}
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-2">
@@ -253,9 +266,27 @@ export default function AdminApprovalPage() {
           confirmLabel={actionConfig.confirmLabel}
           variant={actionConfig.variant}
           onConfirm={handleConfirm}
-          onCancel={() => setAction(null)}
+          onCancel={() => {
+            setAction(null)
+            setRejectionReason('')
+          }}
           isLoading={isMutating}
-        />
+        >
+          {action?.type === 'reject' && (
+            <div className="flex flex-col gap-2">
+              <label htmlFor="rejectionReason" className="text-sm font-medium text-slate-700">
+                Alasan Penolakan <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                id="rejectionReason"
+                className="input min-h-[80px] resize-y"
+                placeholder="Misal: Aset sedang rusak atau jadwal bentrok..."
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+              />
+            </div>
+          )}
+        </ConfirmDialog>
       )}
     </div>
   )

@@ -9,6 +9,7 @@ from app.schemas.loan import (
     AvailabilityResponse,
     LoanCreate,
     LoanResponse,
+    LoanRejectRequest,
 )
 from app.services.borrowing_service import BorrowingService
 
@@ -102,11 +103,12 @@ def approve_loan(
 @router.post("/{loan_id}/reject", response_model=LoanResponse)
 def reject_loan(
     loan_id: int,
+    body: LoanRejectRequest,
     borrowing_service: Annotated[BorrowingService, Depends(get_borrowing_service)] = None,
     current_admin: CurrentAdmin = None,
 ):
     """Reject a pending loan. Admin only."""
-    return borrowing_service.reject_loan(loan_id, admin=current_admin)
+    return borrowing_service.reject_loan(loan_id, admin=current_admin, rejection_reason=body.rejection_reason)
 
 
 @router.post("/{loan_id}/complete", response_model=LoanResponse)
