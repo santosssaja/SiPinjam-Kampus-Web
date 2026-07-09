@@ -421,6 +421,19 @@ alembic downgrade -1
 
 > In development, `init_db()` is called on startup automatically, so migrations are optional.
 
+### Seeding the Database
+
+To populate an empty database with initial dummy data (admin accounts, regular users, items, and rooms), you can run the provided seed script:
+
+```bash
+cd apps/backend
+python seed.py
+```
+
+The script will safely skip execution if the database already contains users.
+Default Admin: `admin@kampus.ac.id` / `admin123`
+Default User: `budi@kampus.ac.id` / `budi123`
+
 ---
 
 ## Running the Frontend
