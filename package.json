@@ -4,14 +4,10 @@
   "private": true,
   "description": "SiPinjam Kampus - Campus Borrowing Management System",
   "workspaces": [
-    "apps/frontend",
-    "packages/shared-types",
-    "packages/shared-utils"
+    "apps/frontend"
   ],
   "scripts": {
     "dev:frontend": "npm run dev --workspace=apps/frontend",
-    "build:frontend": "npm run build --workspace=apps/frontend",
-    "build:shared-types": "npm run build --workspace=packages/shared-types",
-    "install:all": "npm install"
+    "build:frontend": "npm run build --workspace=apps/frontend"
   }
 }
