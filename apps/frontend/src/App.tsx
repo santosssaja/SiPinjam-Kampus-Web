@@ -14,6 +14,7 @@ import LoanHistoryPage from './pages/LoanHistoryPage'
 import AdminApprovalPage from './pages/AdminApprovalPage'
 import CalendarPage from './pages/CalendarPage'
 import ScannerPage from './pages/ScannerPage'
+import LandingPage from './pages/LandingPage'
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           {/* Public */}
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
 
@@ -40,8 +42,7 @@ export default function App() {
             <Route path="/scanner" element={<ScannerPage />} />
           </Route>
 
-          {/* Default redirect */}
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          {/* Default redirect for 404 */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </BrowserRouter>
