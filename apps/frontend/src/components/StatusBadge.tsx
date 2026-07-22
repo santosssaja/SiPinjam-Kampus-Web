@@ -6,6 +6,7 @@ const STATUS_CONFIG: Record<LoanStatus, { label: string; variant: 'default' | 's
   APPROVED: { label: 'Disetujui', variant: 'success' },
   REJECTED: { label: 'Ditolak', variant: 'danger' },
   COMPLETED: { label: 'Selesai', variant: 'default' },
+  CANCELLED: { label: 'Dibatalkan', variant: 'default' },
 }
 
 export default function StatusBadge({ status }: { status: LoanStatus }) {

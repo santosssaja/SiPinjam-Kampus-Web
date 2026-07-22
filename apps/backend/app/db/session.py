@@ -10,12 +10,24 @@ from app.core.config import settings
 # ---------------------------------------------------------------------------
 
 _connect_args = {}
-if settings.DATABASE_URL.startswith("sqlite"):
-    # Required for SQLite to work safely with FastAPI's async environment
+_db_url = settings.DATABASE_URL
+
+if _db_url.startswith("sqlite+libsql://"):
+    # Turso/LibSQL: pass auth token via connect_args to avoid URL encoding issues
+    if settings.TURSO_AUTH_TOKEN:
+        _connect_args = {"auth_token": settings.TURSO_AUTH_TOKEN}
+    # Strip authToken from URL if present (it's now in connect_args)
+    if "authToken=" in _db_url:
+        from urllib.parse import urlparse, urlencode, parse_qs, urlunparse
+        parsed = urlparse(_db_url)
+        qs = {k: v for k, v in parse_qs(parsed.query).items() if k != "authToken"}
+        _db_url = urlunparse(parsed._replace(query=urlencode(qs, doseq=True)))
+elif _db_url.startswith("sqlite:///") or _db_url == "sqlite://":
+    # Local SQLite - check_same_thread required
     _connect_args = {"check_same_thread": False}
 
 engine = create_engine(
-    settings.DATABASE_URL,
+    _db_url,
     echo=settings.is_development,  # SQL logging in dev only
     connect_args=_connect_args,
 )

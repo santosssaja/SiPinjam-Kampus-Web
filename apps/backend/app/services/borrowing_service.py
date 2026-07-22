@@ -25,7 +25,7 @@ from app.models.user import User
 from app.repositories.item_repository import ItemRepository
 from app.repositories.loan_repository import LoanRepository
 from app.repositories.room_repository import RoomRepository
-from app.schemas.loan import AvailabilityResponse, LoanCreate
+from app.schemas.loan import AvailabilityResponse, LoanCreate, LoanUpdate
 
 
 class BorrowingService:
@@ -99,6 +99,84 @@ class BorrowingService:
             status=LoanStatus.PENDING,
         )
         return self._loan_repo.create(loan)
+
+    def update_loan(self, loan_id: int, data: LoanUpdate, borrower: User) -> Loan:
+        """
+        Update a PENDING loan request.
+        """
+        loan = self.get_loan_by_id(loan_id)
+
+        if loan.borrower_id != borrower.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have access to this loan",
+            )
+
+        if loan.status != LoanStatus.PENDING:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"Cannot edit a loan with status '{loan.status.value}'",
+            )
+
+        # Check if temporal/resource fields are updated to run conflict detection
+        new_resource_type = data.resource_type if data.resource_type is not None else loan.resource_type
+        new_resource_id = data.resource_id if data.resource_id is not None else loan.resource_id
+        new_date = data.date if data.date is not None else loan.date
+        new_start_time = data.start_time if data.start_time is not None else loan.start_time
+        new_end_time = data.end_time if data.end_time is not None else loan.end_time
+
+        needs_conflict_check = (
+            data.resource_type is not None or
+            data.resource_id is not None or
+            data.date is not None or
+            data.start_time is not None or
+            data.end_time is not None
+        )
+
+        if needs_conflict_check:
+            self._validate_resource_exists(new_resource_type, new_resource_id)
+            self.detect_conflict(
+                new_resource_type, new_resource_id, new_date, new_start_time, new_end_time, exclude_loan_id=loan.id
+            )
+
+            if new_resource_type == ResourceType.ITEM:
+                self._check_item_quantity(
+                    new_resource_id, new_date, new_start_time, new_end_time, exclude_loan_id=loan.id
+                )
+
+            loan.resource_type = new_resource_type
+            loan.resource_id = new_resource_id
+            loan.date = new_date
+            loan.start_time = new_start_time
+            loan.end_time = new_end_time
+
+        if data.purpose is not None:
+            loan.purpose = data.purpose
+
+        loan.updated_at = datetime.now(timezone.utc)
+        return self._loan_repo.update(loan)
+
+    def cancel_loan(self, loan_id: int, borrower: User) -> Loan:
+        """
+        Cancel a PENDING loan request.
+        """
+        loan = self.get_loan_by_id(loan_id)
+
+        if loan.borrower_id != borrower.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have access to this loan",
+            )
+
+        if loan.status != LoanStatus.PENDING:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"Cannot cancel a loan with status '{loan.status.value}'. Only PENDING loans can be cancelled.",
+            )
+
+        loan.status = LoanStatus.CANCELLED
+        loan.updated_at = datetime.now(timezone.utc)
+        return self._loan_repo.update(loan)
 
     def approve_loan(self, loan_id: int, admin: User) -> Loan:
         """

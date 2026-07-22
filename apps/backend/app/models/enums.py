@@ -22,3 +22,4 @@ class LoanStatus(str, Enum):
     APPROVED = "APPROVED"
     REJECTED = "REJECTED"
     COMPLETED = "COMPLETED"
+    CANCELLED = "CANCELLED"

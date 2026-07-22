@@ -1,3 +1,1 @@
-from app.main import app
-
-__all__ = ["app"]
+# Empty init file to prevent circular imports

@@ -25,6 +25,8 @@ class Settings(BaseSettings):
 
     # Database
     DATABASE_URL: str
+    # Turso auth token (optional - can also be embedded in DATABASE_URL)
+    TURSO_AUTH_TOKEN: str = ""
 
     # CORS
     BACKEND_CORS_ORIGINS: List[str] = []

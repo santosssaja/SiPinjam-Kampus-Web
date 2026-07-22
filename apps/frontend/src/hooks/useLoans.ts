@@ -27,6 +27,23 @@ export function useCreateLoan() {
   })
 }
 
+export function useUpdateLoan() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: Partial<LoanCreateRequest> }) =>
+      loanService.update(id, data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: LOANS_KEY }),
+  })
+}
+
+export function useCancelLoan() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) => loanService.cancel(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: LOANS_KEY }),
+  })
+}
+
 export function useApproveLoan() {
   const qc = useQueryClient()
   return useMutation({

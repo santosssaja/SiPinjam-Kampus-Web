@@ -1,3 +1,6 @@
+import { useCategories, useCreateCategory } from '../hooks/useCategories'
+import CategoryModal from '../components/CategoryModal'
+
 import React, { useState } from 'react'
 import toast from 'react-hot-toast'
 import { useAuth } from '../hooks/useAuth'
@@ -15,7 +18,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
 import { Badge } from '../components/ui/Badge'
-import { Plus, Edit2, Trash2, PackageSearch, Image as ImageIcon } from 'lucide-react'
+import { Plus, Edit2, Trash2, PackageSearch, Image as ImageIcon, Tags } from 'lucide-react'
 import { cn } from '../lib/utils'
 
 function ItemModal({
@@ -29,6 +32,7 @@ function ItemModal({
   onSubmit: (data: ItemCreateRequest | ItemUpdateRequest) => void
   isLoading: boolean
 }) {
+  const { data: categories } = useCategories()
   const [form, setForm] = useState({
     code: item?.code ?? '',
     name: item?.name ?? '',
@@ -91,13 +95,17 @@ function ItemModal({
               </div>
               <div className="space-y-1.5">
                 <label htmlFor="item-category" className="text-sm font-medium text-slate-700">Kategori</label>
-                <Input
+                <select
                   id="item-category"
-                  type="text"
+                  className="flex h-10 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all"
                   value={form.category}
                   onChange={(e) => setForm({ ...form, category: e.target.value })}
-                  placeholder="Elektronik"
-                />
+                >
+                  <option value="">Pilih Kategori</option>
+                  {categories?.map((c) => (
+                    <option key={c.id} value={c.name}>{c.name}</option>
+                  ))}
+                </select>
               </div>
             </div>
             
@@ -202,6 +210,7 @@ export default function ItemsPage() {
 
   const [modalItem, setModalItem] = useState<Item | null | undefined>(undefined)
   const [deleteId, setDeleteId] = useState<number | null>(null)
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false)
 
   const openCreate = () => setModalItem(null)
   const openEdit = (item: Item) => setModalItem(item)
@@ -243,7 +252,7 @@ export default function ItemsPage() {
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">Katalog Peralatan</h1>
           <p className="text-slate-500 mt-1 text-sm">Kelola dan cari peralatan laboratorium yang tersedia.</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <Input 
             placeholder="Cari nama atau kode..." 
             value={search}
@@ -251,10 +260,16 @@ export default function ItemsPage() {
             className="w-full sm:w-64"
           />
           {isAdmin && (
-            <Button id="add-item-btn" onClick={openCreate} className="whitespace-nowrap">
-              <Plus size={16} className="mr-2" />
-              Tambah Peralatan
-            </Button>
+            <>
+              <Button variant="outline" onClick={() => setIsCategoryModalOpen(true)} className="whitespace-nowrap">
+                <Tags size={16} className="mr-2" />
+                Kelola Kategori
+              </Button>
+              <Button id="add-item-btn" onClick={openCreate} className="whitespace-nowrap">
+                <Plus size={16} className="mr-2" />
+                Tambah Peralatan
+              </Button>
+            </>
           )}
         </div>
       </div>
@@ -375,6 +390,10 @@ export default function ItemsPage() {
         onCancel={() => setDeleteId(null)}
         isLoading={deleteItem.isPending}
       />
+
+      {isCategoryModalOpen && (
+        <CategoryModal onClose={() => setIsCategoryModalOpen(false)} />
+      )}
     </div>
   )
 }

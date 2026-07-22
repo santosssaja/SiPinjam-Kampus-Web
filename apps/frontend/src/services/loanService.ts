@@ -23,6 +23,16 @@ export const loanService = {
     return res.data
   },
 
+  async update(id: number, data: Partial<LoanCreateRequest>): Promise<Loan> {
+    const res = await apiClient.put<Loan>(`/loans/${id}`, data)
+    return res.data
+  },
+
+  async cancel(id: number): Promise<Loan> {
+    const res = await apiClient.post<Loan>(`/loans/${id}/cancel`)
+    return res.data
+  },
+
   async approve(id: number): Promise<Loan> {
     const res = await apiClient.post<Loan>(`/loans/${id}/approve`)
     return res.data

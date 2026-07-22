@@ -1,3 +1,2 @@
-from app.db.session import engine, get_session, init_db
-
-__all__ = ["engine", "get_session", "init_db"]
+# Lazy imports - do not import session here to avoid triggering
+# DB engine creation at module load time on Vercel serverless.

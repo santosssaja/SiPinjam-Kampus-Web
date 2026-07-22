@@ -4,11 +4,16 @@
 
 export type UserRole = 'ADMIN' | 'BORROWER'
 export type ResourceType = 'ITEM' | 'ROOM'
-export type LoanStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'COMPLETED'
+export type LoanStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'COMPLETED' | 'CANCELLED'
 
 // -----------------------------------------------------------------------
 // Domain types
 // -----------------------------------------------------------------------
+
+export interface Category {
+  id: number
+  name: string
+}
 
 export interface User {
   id: number
@@ -120,6 +125,10 @@ export interface LoanCreateRequest {
   start_time: string
   end_time: string
   purpose: string
+}
+
+export interface CategoryCreateRequest {
+  name: string
 }
 
 // -----------------------------------------------------------------------

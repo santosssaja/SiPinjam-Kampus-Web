@@ -1,15 +1,30 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useLoans } from '../hooks/useLoans'
+import { useLoans, useCancelLoan } from '../hooks/useLoans'
 import { PageLoader } from '../components/LoadingSpinner'
 import StatusBadge from '../components/StatusBadge'
 import { Loan } from '../types'
 import { Card, CardContent } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
-import { Plus, History, Calendar, Clock as ClockIcon } from 'lucide-react'
+import { Plus, History, Calendar, Clock as ClockIcon, Edit2, XCircle } from 'lucide-react'
 import { cn } from '../lib/utils'
+import EditLoanModal from '../components/EditLoanModal'
+import toast from 'react-hot-toast'
 
 export default function LoanHistoryPage() {
   const { data: loans, isLoading } = useLoans()
+  const cancelLoan = useCancelLoan()
+  const [editingLoan, setEditingLoan] = useState<Loan | null>(null)
+
+  const handleCancel = async (id: number) => {
+    if (!window.confirm('Yakin ingin membatalkan peminjaman ini?')) return
+    try {
+      await cancelLoan.mutateAsync(id)
+      toast.success('Peminjaman dibatalkan')
+    } catch (err: any) {
+      toast.error(err.response?.data?.detail || 'Gagal membatalkan peminjaman')
+    }
+  }
 
   if (isLoading && !loans) return <PageLoader />
 
@@ -49,7 +64,8 @@ export default function LoanHistoryPage() {
                     <th className="px-6 py-4">Waktu</th>
                     <th className="px-6 py-4">Tujuan</th>
                     <th className="px-6 py-4">Status</th>
-                    <th className="px-6 py-4 rounded-tr-xl">Diajukan Pada</th>
+                    <th className="px-6 py-4">Diajukan Pada</th>
+                    <th className="px-6 py-4 rounded-tr-xl">Aksi</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -90,6 +106,20 @@ export default function LoanHistoryPage() {
                       <td className="px-6 py-4 text-xs text-slate-400">
                         {new Date(loan.created_at).toLocaleDateString('id-ID')}
                       </td>
+                      <td className="px-6 py-4">
+                        {loan.status === 'PENDING' ? (
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm" onClick={() => setEditingLoan(loan)} title="Edit">
+                              <Edit2 size={14} />
+                            </Button>
+                            <Button variant="danger" size="sm" onClick={() => handleCancel(loan.id)} isLoading={cancelLoan.isPending && cancelLoan.variables === loan.id} title="Batalkan">
+                              <XCircle size={14} />
+                            </Button>
+                          </div>
+                        ) : (
+                          <span className="text-slate-300 text-xs">-</span>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -98,6 +128,14 @@ export default function LoanHistoryPage() {
           )}
         </CardContent>
       </Card>
+      
+      {editingLoan && (
+        <EditLoanModal 
+          loan={editingLoan} 
+          isOpen={!!editingLoan} 
+          onClose={() => setEditingLoan(null)} 
+        />
+      )}
     </div>
   )
 }

@@ -4,6 +4,7 @@ from app.models.loan import Loan
 from app.models.room import Room
 from app.models.user import User
 from app.models.image import Image
+from app.models.category import Category
 
 __all__ = [
     "User",
@@ -14,4 +15,5 @@ __all__ = [
     "ResourceType",
     "LoanStatus",
     "Image",
+    "Category",
 ]

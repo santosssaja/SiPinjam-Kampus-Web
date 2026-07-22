@@ -44,6 +44,35 @@ class LoanRejectRequest(BaseModel):
     
     rejection_reason: str
 
+class LoanUpdate(BaseModel):
+    """Schema for updating a pending loan."""
+
+    resource_type: Optional[ResourceType] = None
+    resource_id: Optional[int] = None
+    date: Optional[date] = None
+    start_time: Optional[time] = None
+    end_time: Optional[time] = None
+    purpose: Optional[str] = None
+
+    @field_validator("end_time")
+    @classmethod
+    def end_after_start(cls, end_time: Optional[time], info) -> Optional[time]:
+        if not end_time:
+            return end_time
+        start_time = info.data.get("start_time")
+        if start_time and end_time <= start_time:
+            raise ValueError("end_time must be after start_time")
+        return end_time
+
+    @field_validator("purpose")
+    @classmethod
+    def purpose_not_empty(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None:
+            v = v.strip()
+            if not v:
+                raise ValueError("Purpose cannot be empty")
+        return v
+
 # ---------------------------------------------------------------------------
 # Availability Check
 # ---------------------------------------------------------------------------

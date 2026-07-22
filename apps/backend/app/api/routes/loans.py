@@ -10,6 +10,7 @@ from app.schemas.loan import (
     LoanCreate,
     LoanResponse,
     LoanRejectRequest,
+    LoanUpdate,
 )
 from app.services.borrowing_service import BorrowingService
 
@@ -88,6 +89,27 @@ def create_loan(
 ):
     """Submit a new loan/reservation request."""
     return borrowing_service.create_loan(data, borrower=current_user)
+
+
+@router.put("/{loan_id}", response_model=LoanResponse)
+def update_loan(
+    loan_id: int,
+    data: LoanUpdate,
+    borrowing_service: Annotated[BorrowingService, Depends(get_borrowing_service)] = None,
+    current_user: CurrentUser = None,
+):
+    """Update a pending loan request."""
+    return borrowing_service.update_loan(loan_id, data, borrower=current_user)
+
+
+@router.post("/{loan_id}/cancel", response_model=LoanResponse)
+def cancel_loan(
+    loan_id: int,
+    borrowing_service: Annotated[BorrowingService, Depends(get_borrowing_service)] = None,
+    current_user: CurrentUser = None,
+):
+    """Cancel a pending loan request."""
+    return borrowing_service.cancel_loan(loan_id, borrower=current_user)
 
 
 @router.post("/{loan_id}/approve", response_model=LoanResponse)
